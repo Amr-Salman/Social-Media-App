@@ -2,18 +2,21 @@ const User = require('../models/userModel');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const asyncHandler = require('express-async-handler');
+const { authValidation } = require('../utils/validation');
 
 // @Desc    Register a user
 // @route   POST api/auth/register
 // @Access  Public
 const register = asyncHandler(async (req, res) => {
+  // Validate fields
+  const { isError, errors } = authValidation.register(req.body);
+  if (isError) {
+    res.status(400);
+    throw new Error(errors);
+  }
+
   const { username, email, password } = req.body;
   try {
-    if (password.length < 6) {
-      res.status(400);
-      throw new Error('Password should be at least 6 charachters.');
-    }
-
     // Check if user exists
     const userExists = await User.findOne({ email });
     if (userExists) {
@@ -44,6 +47,12 @@ const register = asyncHandler(async (req, res) => {
 // @route   POST api/auth/login
 // @Access  Public
 const login = asyncHandler(async (req, res) => {
+  // Validate fields
+  const { isError, errors } = authValidation.login(req.body);
+  if (isError) {
+    res.status(400);
+    throw new Error(errors);
+  }
   const { email, password } = req.body;
   try {
     const user = await User.findOne({ email });
