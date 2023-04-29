@@ -5,7 +5,10 @@ const postController = require('../controllers/postController');
 const router = express.Router();
 
 // Get timeline posts
-router.get('/timeline/all', postController.getTimelinePosts);
+router.get('/timeline/:userID', postController.getTimelinePosts);
+
+// Get user posts
+router.get('/user/:userID', postController.getUserPosts);
 
 // Get a post
 router.get('/:postID', postController.getPost);

@@ -60,6 +60,10 @@ const authValidation = {
   },
 };
 
+const isMongoID = (ID) => {
+  return validator.isMongoId(ID);
+};
 module.exports = {
   authValidation,
+  isMongoID,
 };

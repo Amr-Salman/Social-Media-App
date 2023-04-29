@@ -1,19 +1,23 @@
 const Post = require('../models/postModel');
+const User = require('../models/userModel');
 const asyncHandler = require('express-async-handler');
+const { isMongoID } = require('../utils/validation');
 
 // @Desc    Create a post
 // @Route   POST api/post/
 // @Access  Private
 const createPost = asyncHandler(async (req, res) => {
-  const { desc, img } = req.body;
   try {
-    const newPost = await Post.create({ desc, img, user: req.user._id });
-    res
-      .status(201)
-      .json({ message: 'Post created successfully.', payload: newPost });
+    const newPost = (
+      await Post.create({ ...req.body, user: req.user._id })
+    ).populate('user', 'username email _id profilePicture');
+    res.status(201).json({
+      message: 'Post created successfully.',
+      payload: await newPost,
+    });
   } catch (error) {
     res.status(500);
-    throw new Error(err.message);
+    throw new Error(error.message);
   }
 });
 
@@ -89,16 +93,52 @@ const getPost = asyncHandler(async (req, res) => {
 // @Access  Private
 const getTimelinePosts = asyncHandler(async (req, res) => {
   try {
-    const userPosts = await Post.find({ user: req.user._id.toString() });
+    const userPosts = await Post.find({
+      user: req.user._id.toString(),
+    }).populate('user', 'username email _id profilePicture');
     // Get all the user's following posts
     const followingPosts = await Promise.all(
       req.user.followings.map((friend) => {
-        return Post.find({ user: friend });
+        return Post.find({ user: friend }).populate(
+          'user',
+          'username email _id profilePicture'
+        );
       })
     );
     res.status(201).json({
       message: 'Timeline got successfully.',
       payload: userPosts.concat(...followingPosts),
+    });
+  } catch (error) {
+    res.status(500);
+    throw new Error(err.message);
+  }
+});
+
+// @Desc    Get all user posts
+// @Route   GET api/post/user/:id
+// @Access  Private
+const getUserPosts = asyncHandler(async (req, res) => {
+  const { userID } = req.params;
+  if (!isMongoID(userID)) {
+    res.status(404);
+    throw new Error('User not found.');
+  }
+  // Get the user to check if exist
+  const user = await User.findById(userID);
+
+  if (!user) {
+    res.status(404);
+    throw new Error('User not found.');
+  }
+  try {
+    const userPosts = await Post.find({
+      user: userID,
+    }).populate('user', 'username email _id profilePicture');
+
+    res.status(201).json({
+      message: 'Timeline got successfully.',
+      payload: userPosts,
     });
   } catch (error) {
     res.status(500);
@@ -160,5 +200,6 @@ module.exports = {
   updatePost,
   getPost,
   getTimelinePosts,
+  getUserPosts,
   likePost,
 };

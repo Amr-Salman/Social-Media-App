@@ -12,10 +12,7 @@ router.delete('/:userID', userController.deleteUser);
 // Get a user
 router.get('/:userID', userController.getUser);
 
-// Follow a user
+// Follow/Unfollow a user
 router.patch('/:userID/follow', userController.followUser);
-
-// Unfollow a user
-router.patch('/:userID/unfollow', userController.unfollowUser);
 
 module.exports = router;
