@@ -26,6 +26,14 @@ const createPost = asyncHandler(async (req, res) => {
 // @Access  Private
 const updatePost = asyncHandler(async (req, res) => {
   const { postID } = req.params;
+
+  // Check if the ID is valid Mongo ID
+  if (!isMongoID(postID)) {
+    res.status(404);
+    throw new Error('Post not found.');
+  }
+
+  // Get the Post
   const post = await Post.findById(postID);
 
   // Check if post exists and the user is the post user
@@ -53,6 +61,14 @@ const updatePost = asyncHandler(async (req, res) => {
 // @Access  Private
 const deletePost = asyncHandler(async (req, res) => {
   const { postID } = req.params;
+
+  // Check if the ID is valid Mongo ID
+  if (!isMongoID(postID)) {
+    res.status(404);
+    throw new Error('Post not found.');
+  }
+
+  // Get the Post
   const post = await Post.findById(postID);
 
   // Check if post exists and the user is the post user
@@ -78,6 +94,14 @@ const deletePost = asyncHandler(async (req, res) => {
 // @Access  Private
 const getPost = asyncHandler(async (req, res) => {
   const { postID } = req.params;
+
+  // Check if the ID is valid Mongo ID
+  if (!isMongoID(postID)) {
+    res.status(404);
+    throw new Error('Post not found.');
+  }
+
+  // Get the post
   const post = await Post.findById(postID);
 
   // Check if post exists
@@ -120,6 +144,8 @@ const getTimelinePosts = asyncHandler(async (req, res) => {
 // @Access  Private
 const getUserPosts = asyncHandler(async (req, res) => {
   const { userID } = req.params;
+
+  // Check if the ID is valid Mongo ID
   if (!isMongoID(userID)) {
     res.status(404);
     throw new Error('User not found.');
@@ -151,6 +177,14 @@ const getUserPosts = asyncHandler(async (req, res) => {
 // @Access  Private
 const likePost = asyncHandler(async (req, res) => {
   const { postID } = req.params;
+
+  // Check if the ID is valid Mongo ID
+  if (!isMongoID(postID)) {
+    res.status(404);
+    throw new Error('Post not found.');
+  }
+
+  // Get the Post
   const post = await Post.findById(postID);
 
   // Check if post exists

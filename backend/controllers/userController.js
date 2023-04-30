@@ -9,6 +9,13 @@ const { isMongoID } = require('../utils/validation');
 // @Access  Private
 const updateUser = asyncHandler(async (req, res) => {
   const { userID } = req.params;
+
+  // Check if the ID is valid Mongo ID
+  if (!isMongoID(userID)) {
+    res.status(404);
+    throw new Error('User not found.');
+  }
+
   if (userID !== req.user._id.toString()) {
     res.status(400);
     throw new Error('You can only updated your account!!');
@@ -37,6 +44,13 @@ const updateUser = asyncHandler(async (req, res) => {
 // @Access  Private
 const deleteUser = asyncHandler(async (req, res) => {
   const { userID } = req.params;
+
+  // Check if the ID is valid Mongo ID
+  if (!isMongoID(userID)) {
+    res.status(404);
+    throw new Error('User not found.');
+  }
+
   if (userID !== req.user._id.toString()) {
     res.status(400);
     throw new Error('You can only deleted your account!!');
@@ -57,10 +71,13 @@ const deleteUser = asyncHandler(async (req, res) => {
 // @Access  Private
 const getUser = asyncHandler(async (req, res) => {
   const { userID } = req.params;
+
+  // Check if the ID is valid Mongo ID
   if (!isMongoID(userID)) {
     res.status(404);
     throw new Error('User not found.');
   }
+
   try {
     const user = await User.findById(userID).select(
       '-password -isAdmin -updatedAt'
@@ -88,6 +105,13 @@ const getUser = asyncHandler(async (req, res) => {
 // @Access  Private
 const followUser = asyncHandler(async (req, res) => {
   const { userID } = req.params;
+
+  // Check if the ID is valid Mongo ID
+  if (!isMongoID(userID)) {
+    res.status(404);
+    throw new Error('User not found.');
+  }
+
   if (userID === req.user._id.toString()) {
     res.status(400);
     throw new Error('You can not follow yourself!!');
