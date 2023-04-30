@@ -162,7 +162,9 @@ const getUserPosts = asyncHandler(async (req, res) => {
   try {
     const userPosts = await Post.find({
       user: userID,
-    }).populate('user', 'username email _id profilePicture');
+    })
+      .populate('user', 'username email _id profilePicture')
+      .sort({ createdAt: -1 });
 
     res.status(201).json({
       message: 'Timeline got successfully.',
