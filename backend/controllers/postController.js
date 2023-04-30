@@ -131,7 +131,9 @@ const getTimelinePosts = asyncHandler(async (req, res) => {
     );
     res.status(201).json({
       message: 'Timeline got successfully.',
-      payload: userPosts.concat(...followingPosts),
+      payload: userPosts
+        .concat(...followingPosts)
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)),
     });
   } catch (error) {
     res.status(500);
