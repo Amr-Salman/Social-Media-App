@@ -1,9 +1,10 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const dotenv = require('dotenv');
-const mongoose = require('mongoose');
+const multer = require('multer');
 
 // Required custome middleweares
 const errorHandler = require('./middlewares/errorHandler');
@@ -27,9 +28,9 @@ app.use(helmet());
 app.use(morgan('common'));
 
 // Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/users', protectRoutes, userRoutes);
-app.use('/api/posts', protectRoutes, postRoutes);
+app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/users', protectRoutes, userRoutes);
+app.use('/api/v1/posts', protectRoutes, postRoutes);
 
 // Listening to requests
 const port = process.env.PORT || 5000;
