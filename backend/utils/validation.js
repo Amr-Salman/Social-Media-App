@@ -13,7 +13,7 @@ const authValidation = {
     }
 
     // Validate name field
-    if (!validator.isLength(userData.name, { min: 3, max: 30 })) {
+    if (!validator.isLength(userData.username, { min: 3, max: 30 })) {
       isError = true;
       errors.push('Name should be between 3-30 characters.');
     }

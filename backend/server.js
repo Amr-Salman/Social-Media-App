@@ -4,7 +4,6 @@ const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const dotenv = require('dotenv');
-const multer = require('multer');
 
 // Required custome middleweares
 const errorHandler = require('./middlewares/errorHandler');
@@ -22,6 +21,7 @@ dotenv.config();
 const app = express();
 
 // Middlewares
+app.use(express.static('assets'));
 app.use(cors());
 app.use(express.json());
 app.use(helmet());

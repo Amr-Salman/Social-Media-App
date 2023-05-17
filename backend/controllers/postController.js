@@ -1,4 +1,5 @@
 const Post = require('../models/postModel');
+const Comment = require('../models/commentModel');
 const User = require('../models/userModel');
 const asyncHandler = require('express-async-handler');
 const { isMongoID } = require('../utils/validation');
@@ -102,14 +103,26 @@ const getPost = asyncHandler(async (req, res) => {
   }
 
   // Get the post
-  const post = await Post.findById(postID);
+  const post = await Post.findById(postID).populate(
+    'user',
+    'username email _id profilePicture'
+  );
 
   // Check if post exists
   if (!post) {
     res.status(404);
     throw new Error('Post not found.');
   }
-  res.status(201).json({ message: 'Post got successfully.', payload: post });
+
+  // Get the comments
+  const comments = await Comment.find({ post: postID }).populate(
+    'user',
+    'username email _id profilePicture'
+  );
+  res.status(201).json({
+    message: 'Post got successfully.',
+    payload: { ...post._doc, comments: comments },
+  });
 });
 
 // @Desc    Get timeline posts
@@ -232,6 +245,90 @@ const likePost = asyncHandler(async (req, res) => {
   }
 });
 
+// @Desc    Create a comment
+// @Route   POST api/post/:postID/comment
+// @Access  Private
+const createComment = asyncHandler(async (req, res) => {
+  const { postID } = req.params;
+
+  // Check if the ID is valid Mongo ID
+  if (!isMongoID(postID)) {
+    res.status(404);
+    throw new Error('Post not found.');
+  }
+
+  // Get the post
+  const post = await Post.findById(postID);
+
+  // Check if post exists
+  if (!post) {
+    res.status(404);
+    throw new Error('Post not found.');
+  }
+
+  try {
+    const comment = await Comment.create({
+      text: req.body.text,
+      user: req.user._id,
+      post: postID,
+    });
+    res.status(201).json({
+      message: 'Comment created successfully.',
+      payload: await comment.populate(
+        'user',
+        'username email _id profilePicture'
+      ),
+    });
+  } catch (error) {
+    res.status(500);
+    throw new Error(error.message);
+  }
+});
+
+// @Desc    Delete a comment
+// @Route   DELETE api/posts/:postID/:commentID
+// @Access  Private
+const deleteComment = asyncHandler(async (req, res) => {
+  const { postID, commentID } = req.params;
+  console.log('postID', postID);
+  console.log('commentID', commentID);
+  // Check if the ID is valid Mongo ID
+  if (!isMongoID(postID)) {
+    res.status(404);
+    throw new Error('Post not found.');
+  }
+  if (!isMongoID(commentID)) {
+    res.status(404);
+    throw new Error('Comment not found.');
+  }
+
+  // Get the Post
+  const post = await Post.findById(postID);
+  const comment = await Comment.findById(commentID);
+  console.log(comment);
+
+  // Check if post and comment exists and the user is the post user
+  if (!post) {
+    res.status(404);
+    throw new Error('Post not found.');
+  }
+  if (!comment || comment.user.toString() !== req.user._id.toString()) {
+    res.status(404);
+    throw new Error('Comment not found.');
+  }
+
+  // Delete the post
+  try {
+    const comment = await Comment.findByIdAndDelete(commentID);
+    res
+      .status(201)
+      .json({ message: 'Comment deleted successfully.', payload: comment });
+  } catch (error) {
+    res.status(500);
+    throw new Error(err.message);
+  }
+});
+
 module.exports = {
   createPost,
   deletePost,
@@ -240,4 +337,6 @@ module.exports = {
   getTimelinePosts,
   getUserPosts,
   likePost,
+  createComment,
+  deleteComment,
 };

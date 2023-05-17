@@ -25,4 +25,10 @@ router.delete('/:postID', postController.deletePost);
 // Like/Dislike a post
 router.post('/:postID/like', postController.likePost);
 
+// Create a comment
+router.post('/:postID/comment', postController.createComment);
+
+// Delete a comment
+router.delete('/:postID/:commentID', postController.deleteComment);
+
 module.exports = router;

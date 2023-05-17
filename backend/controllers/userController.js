@@ -9,7 +9,6 @@ const { isMongoID } = require('../utils/validation');
 // @Access  Private
 const updateUser = asyncHandler(async (req, res) => {
   const { userID } = req.params;
-
   // Check if the ID is valid Mongo ID
   if (!isMongoID(userID)) {
     res.status(404);
